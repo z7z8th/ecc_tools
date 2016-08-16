@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <gmp.h>
 #include "ecc_config.h"
 #include "ecc_utils.h"
 
@@ -30,6 +31,12 @@ void print_hex(const char* what, const unsigned long group, const void *p1, cons
 	}
 	printf("\n");
 }
+
+void dump_mpz(const char * what, mpz_t n) {
+	printf("%s _mp_alloc %d _mp_size %d\n", what, n->_mp_alloc, n->_mp_size);
+	print_hex(what, 4, n->_mp_d, n->_mp_size*sizeof(mp_limb_t));
+}
+
 
 
 prng_state yarrow_prng;
@@ -85,7 +92,7 @@ int ecc_export_file(const char *file, void *buf, int size) {
 int ecc_init_key(int keysize, ecc_key *key) {
 	int x, err;
 	if(keysize != ECC_KEY_SIZE) {
-		printf("Error: only key size %d is supported currently!\n", ECC_KEY_SIZE);
+		printf("Error: only key size %lu is supported currently!\n", ECC_KEY_SIZE);
 		return -1;
 	}
 	/* find key size */
@@ -117,7 +124,7 @@ int ecc_import_pubkey(int keysize, const char *pub_file, ecc_key *key) {
 		printf("failed to alloc mem for public key!\n");
 		return -1;
 	}
-	if(ecc_import_file(pub_file, pub, ECC_KEY_SIZE*2)) {
+	if(ecc_import_file(pub_file, pub, keysize*2)) {
 		printf("import public key from file failed!\n");
 		return -1;
 	}

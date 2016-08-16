@@ -14,7 +14,8 @@ struct func_tbl func_tbl[] = {
 	{ "keygen", ecc_keygen },
 	{ "sign", ecc_sign },
 	{ "verify", ecc_verify },
-	{"", NULL},
+	{ "verify_pubkey", ecc_verify_pubkey},
+	{ "", NULL },
 };
 
 void dump_commands() {

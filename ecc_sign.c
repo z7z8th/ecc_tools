@@ -39,7 +39,7 @@ int ecc_sign_hash_bin(const unsigned char *in,  unsigned long inlen,
    	goto error;
    }
    *outlen = mp_unsigned_bin_size(r);
-   if((err = mp_to_unsigned_bin(s, out+ECC_KEY_SIZE)) != CRYPT_OK) {
+   if((err = mp_to_unsigned_bin(s, out+key->dp->size)) != CRYPT_OK) {
    	goto error;
    }
    *outlen += mp_unsigned_bin_size(s);
@@ -81,8 +81,14 @@ int ecc_sign(int argc, char *argv[]) {
 		printf("ecc_sign_hash failed! err %d\n", err);
 		return err;
 	}
-	if(keysize*2 != sig_len) {
-		printf("geneated signature length is not ECC_KEY_SIZE*2\n");
+	if(keysize*2 > sig_len) {
+		printf("geneated signature length %lu is not %lu(ECC_KEY_SIZE*2), this is not an error, ignore! (%s)\n",
+				sig_len, ECC_KEY_SIZE*2, argv[5]);
+		//return -1;
+	}
+	if(keysize*2 < sig_len) {
+		printf("Error: geneated signature length %lu larger than %lu(ECC_KEY_SIZE*2), overflow! (%s)\n",
+				sig_len, ECC_KEY_SIZE*2, argv[5]);
 		return -1;
 	}
 	if(ecc_export_file(argv[5], signature, keysize*2)) {
