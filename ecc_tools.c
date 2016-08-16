@@ -13,20 +13,26 @@ struct func_tbl {
 struct func_tbl func_tbl[] = {
 	{ "keygen", ecc_keygen },
 	{ "sign", ecc_sign },
+	{ "verify", ecc_verify },
 	{"", NULL},
 };
 
-
+void dump_commands() {
+	int i;
+	printf("availble commands are:\n");
+	for(i=0; i<ARRAY_SIZE(func_tbl); i++) {
+		printf(func_tbl[i].name);
+		printf("  ");
+	}
+	printf("\n");
+}
 
 int main(int argc, char *argv[]) {
 	int i = 0;
+	int err = 0;
 	if(argc < 2) {
-		printf("need a command! availble commands are:\n");
-		for(i=0; i<ARRAY_SIZE(func_tbl); i++) {
-			printf(func_tbl[i].name);
-			printf("  ");
-		}
-		printf("\n");
+		printf("need a command!\n");
+		dump_commands();
 		return -1;
 	}
 
@@ -34,8 +40,15 @@ int main(int argc, char *argv[]) {
 
 	for(i=0; i<ARRAY_SIZE(func_tbl); i++) {
 		if(!strcmp(argv[1], func_tbl[i].name)) {
-			func_tbl[i].func(argc, argv);
+			err = func_tbl[i].func(argc, argv);
+			break;
 		}
 	}
+	if(i == ARRAY_SIZE(func_tbl)) {
+		printf("unrecoginzed command: %s\n", argv[1]);
+		dump_commands();
+		return -1;
+	}
+	return err;
 }
 

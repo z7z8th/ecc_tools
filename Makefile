@@ -7,7 +7,7 @@ LIBS := -ltomcrypt -lgmp
 CC := gcc
 LD := gcc
 
-OBJS := ecc_tools.o ecc_keygen.o ecc_utils.o
+OBJS := ecc_tools.o ecc_sign.o ecc_verify.o ecc_keygen.o ecc_utils.o
 TARGET := ecc_tools
 
 %.o: %.c

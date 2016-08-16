@@ -65,7 +65,7 @@ int ecc_keygen(int argc, char *argv[]) {
 		perror("open privkey_file");
 		return -1;
 	}
-	ecc_export_key(fd_pub, fd_priv, &key);
+	ret = ecc_export_key(fd_pub, fd_priv, &key);
 	close(fd_priv);
 	close(fd_pub);
 

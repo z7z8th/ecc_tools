@@ -14,5 +14,9 @@ typedef uint32_t u32;
 #define ECC_CURVE_A	(-3)
 #define ECC_CURVE_B	(1)
 
-#define DUMP_KEYS	1
+#define DUMP_KEYS	0
+
+#define ECC_HASH_BITS	(384)
+#define ECC_HASH_SIZE	(ECC_HASH_BITS/8)
+
 #endif
