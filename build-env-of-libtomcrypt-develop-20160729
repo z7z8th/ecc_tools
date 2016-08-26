@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#MATHDIR=$PWD/../libMATHDIR-1.0
+#ls $MATHDIR/*.a
+
+#CFLAGS="-DLTC_VERBOSE=1 -DUSE_LTM=1 -DLTM_DESC=1 -I$MATHDIR"
+#EXTRALIBS=" -L$MATHDIR -lMATHDIR"
+
+CFLAGS="-g3 -O2 -DUSE_GMP=1 -DGMP_DESC=1"
+EXTRALIBS=" -lgmp"
+export CFLAGS
+export EXTRALIBS
+
+make -j4 IGNORE_SPEED=1
+make -j1 test
+make -j1 all_test
