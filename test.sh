@@ -27,8 +27,9 @@ function test_sign() {
 	echo "test_sign"
 	for ((i=0;i<$TEST_CNT;i++)); do
 		for ((j=0;j<$SIGN_CNT;j++)); do
-			../ecc_tools sign test-pub-$i test-priv-$i test-hash-$j test-sig-$i-$j | grep 'this is not an error, ignored'
+			sign_log=`../ecc_tools sign test-pub-$i test-priv-$i test-hash-$j test-sig-$i-$j`
 			[ $? -ne 0 ] && echo "sign [$i-$j] failed."
+			echo $sign_log | grep 'this is not an error, ignored'
 		done
 	done
 	chmod 0400 test-sig-*
@@ -53,10 +54,10 @@ function test_cleanup() {
 }
 
 
-#test_cleanup
-#test_keygen
-#test_hashgen
-#test_sign
+test_cleanup
+test_keygen
+test_hashgen
+test_sign
 test_verify
 #test_cleanup
 

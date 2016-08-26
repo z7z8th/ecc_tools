@@ -4,10 +4,12 @@
 #include "ecc_config.h"
 #include "ecc_utils.h"
 
-/* verify 
+#define DEBUG 0
+
+/* verify
  *
  * w  = s^-1 mod n
- * u1 = xw 
+ * u1 = xw
  * u2 = rw
  * X = u1*G + u2*Q
  * v = X_x1 mod n
@@ -98,13 +100,13 @@ int ecc_verify_hash_raw_l(      void   *r, void   *s,
    if (ltc_mp.ecc_mul2add == NULL) {
       if ((err = ltc_mp.ecc_ptmul(u1, mG, mG, m, 0)) != CRYPT_OK)                                       { goto error; }
       if ((err = ltc_mp.ecc_ptmul(u2, mQ, mQ, m, 0)) != CRYPT_OK)                                       { goto error; }
-  
+
       /* find the montgomery mp */
       if ((err = mp_montgomery_setup(m, &mp)) != CRYPT_OK)                                              { goto error; }
 
       /* add them */
       if ((err = ltc_mp.ecc_ptadd(mQ, mG, mG, m, mp)) != CRYPT_OK)                                      { goto error; }
-   
+
       /* reduce */
       if ((err = ltc_mp.ecc_map(mG, m, mp)) != CRYPT_OK)                                                { goto error; }
    } else {
@@ -116,8 +118,10 @@ int ecc_verify_hash_raw_l(      void   *r, void   *s,
    if ((err = mp_mod(mG->x, p, v)) != CRYPT_OK)                                                         { goto error; }
 
    /* does v == r */
+#if DEBUG
    dump_mpz("v", v);
    dump_mpz("r", r);
+#endif
    if (mp_cmp(v, r) == LTC_MP_EQ) {
       *stat = 1;
    }
@@ -128,7 +132,7 @@ error:
    ltc_ecc_del_point(mG);
    ltc_ecc_del_point(mQ);
    mp_clear_multi(v, w, u1, u2, p, e, m, NULL);
-   if (mp != NULL) { 
+   if (mp != NULL) {
       mp_montgomery_free(mp);
    }
    return err;
@@ -165,8 +169,8 @@ int ecc_verify_hash_bin(const unsigned char *sig,  unsigned long siglen,
    keysize = key->dp->size;
 
    /* parse header */
-   if((err = mp_read_unsigned_bin(r, (void *)sig, keysize)) != CRYPT_OK) { goto error; }
-   if((err = mp_read_unsigned_bin(s, (void *)sig+keysize, keysize)) != CRYPT_OK) { goto error; }
+   if((err = mp_read_unsigned_bin(r, (u8 *)sig, keysize)) != CRYPT_OK) { goto error; }
+   if((err = mp_read_unsigned_bin(s, (u8 *)sig+keysize, keysize)) != CRYPT_OK) { goto error; }
 
    /* do the op */
    err = ecc_verify_hash_raw_l(r, s, hash, hashlen, stat, key);
@@ -188,7 +192,7 @@ int ecc_verify(int argc, char *argv[]) {
 	unsigned long sig_len = keysize*2;
 	int err = 0;
 	int stat = 0;
-	
+
 	if(argc != 5) {
 		printf("usage:\n %s pubkey_file hash_file signature_file\n", argv[0]);
 		return -1;
@@ -216,7 +220,7 @@ int ecc_verify(int argc, char *argv[]) {
 		printf("import signature failed!\n");
 		return -1;
 	}
-	if((err = ecc_verify_hash_bin(signature, sig_len, hash, keysize, 
+	if((err = ecc_verify_hash_bin(signature, sig_len, hash, keysize,
 					&stat, &pubkey)) != CRYPT_OK) {
 		printf("ecc_verify_hash failed! err %d\n", err);
 		return err;

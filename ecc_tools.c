@@ -18,8 +18,8 @@ struct func_tbl func_tbl[] = {
 	{ "", NULL },
 };
 
-void dump_commands() {
-	int i;
+void dump_commands(void) {
+	size_t i;
 	printf("availble commands are:\n");
 	for(i=0; i<ARRAY_SIZE(func_tbl); i++) {
 		printf(func_tbl[i].name);
@@ -29,7 +29,7 @@ void dump_commands() {
 }
 
 int main(int argc, char *argv[]) {
-	int i = 0;
+	size_t i = 0;
 	int err = 0;
 	if(argc < 2) {
 		printf("need a command!\n");
